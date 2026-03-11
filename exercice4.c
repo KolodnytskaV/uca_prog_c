@@ -21,7 +21,7 @@ void afficheMenu(char * prenom)
     printf("0. Quitter\n");
 }
 
-void afficheTab(int tan[N][N]) 
+void afficheTab(int tab[][N]) 
 {
 	int i, j;
 	for (i = 0; i < N; i++) {
@@ -32,7 +32,7 @@ void afficheTab(int tan[N][N])
 	}
 }
 
-void modifCase(tab[][]) 
+void modifCase(int tab[][N]) 
 {
 	int dom, ext, res;
 	
@@ -52,7 +52,7 @@ void modifCase(tab[][])
 int nbPoints(int tab[N][N], int numEquipe)
 {
 	int total = 0; 
-	int i, j; 
+	int i; 
 	for (i = 0; i < N; i++)
 	{
 		if (i != numEquipe)
@@ -68,8 +68,92 @@ int nbPoints(int tab[N][N], int numEquipe)
 				total += 2;
 			else if (tab[numEquipe] == 0)
 				total += 1; 
+		}
 	}
 	return total;
+}
+
+void afficheScores(int tab[][N]) 
+{
+	int i;
+	for (i = 0; i < N; i++) 
+	{
+		printf(	"Equipe %d : %d points\n", i, nbPoints(tab, i));
+	}  
+}
+
+int equipeLeader(int tab[][N]) 
+{
+	int i;
+	int maxPoints = nbPoints(tab, 0);
+	int leader = 0; 
+	for (i = 1; i < N; i++) 
+	{
+		if (nbPoints(tab, i) > maxPoints) 
+		{
+			leader = i; 	
+		}
+	}
+	return leader; 
+}
+
+int nbVictoires(int tab[N][N], int numEquipe, char domOuExt) 
+{
+	int i = 0;
+	int victoires = 0;
+	for (i = 0; i < N; i++) 
+	{
+		if (i != numEquipe)
+		{
+			if (domOuExt == 'd') 
+			{
+				if (tab[numEquipe][i] == 1) 
+				{
+					victoires++;
+				}
+			}
+			else if (domOuExt == 'e') 
+			{
+				if (tab[i][numEquipe] == 2)
+				{
+					victoires++;
+				}
+			}
+		}
+	}
+	return victoires;
+}
+
+int meilleureEquipeDomicile(int tab[][N]) 
+{
+	int i;
+	int max = nbVictoires(tab, 0, 'd');
+	int meilleure = 0;
+	for (i = 1; i < N; i++) 
+	{
+		if (nbVictoires(tab, i, 'd') > max)
+		{
+			max = nbVictoires(tab, i, 'd');
+			meilleure = i;
+		}
+	}
+	return meilleure;
+}
+
+int meilleureEquipeExterieur(int tab[][N])
+{
+	int i;
+	int max = nbVictoires(tab, 0, 'e');
+	int meilleure = 0;
+	for (i = 1; i < N; i++) 
+	{
+		if (nbVictoires(tab, i, 'e') > max)
+		{
+			max = nbVictoires(tab, i, 'e');
+			meilleure = i;
+		}
+	}
+	return meilleure;
 }
 
 int main()
@@ -93,7 +177,7 @@ int main()
     char prenom[20];
     printf("Bienvenue, quel est votre nom ? ");
     scanf("%s", prenom);
-    
+    int choix;
     do {
     	afficheMenu(prenom);
     	printf("Votre choix: ");
@@ -109,12 +193,25 @@ int main()
     			modifCase(resultat); 
     			break; 
     		case 3:
-    		{
     			int equipe;
     			printf("Choisissez un numero d'équipe: ");
     			scanf("%d", &equipe);
-    			printf("les points d'equipe %d: %d", equipe, nbPoints(resultat, equipe); 
-    		}
+    			printf("les points d'equipe %d: %d", equipe, nbPoints(resultat, equipe)); 
+    			break;
+    		case 4: 
+    			afficheScores(resultat);
+    			break;
+    		case 5: 
+    			int leader = equipeLeader(resultat);
+    			printf("L'équipe ayant plus de points est l'équipe %d avec %d points\n", leader, nbPoints(resultat, leader));
+    			break;
+    		case 6:
+    			int meilleureDomicile = meilleureEquipeDomicile(resultat);
+    			printf("L'équipe %d avec %d victoires à domicile est la meilleure\n", meilleureDomicile, nbVictoires(resultat, meilleureDomicile, 'd'));
+    			break;
+    		case 7: 
+    			int meilleureExterieur = meilleureEquipeExterieur(resultat);
+    			printf("L'équipe %d avec %d victoires à l'extérieur est la meilleure\n", meilleureExterieur, nbVictoires(resultat, meilleureExterieur, 'e'));
     			break;
     		default:
     			break;
